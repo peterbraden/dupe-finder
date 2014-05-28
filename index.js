@@ -16,7 +16,10 @@ var handleEnd = function(){
     , tot = 0
   DUPLICATES.forEach(function(d){
     var size = fs.statSync(d[1]).size
+      , home = path.resolve('~').slice(0, -1)
     d[0] = d[0].slice(0, 10)
+    d[1] = d[1].replace(home, '~/')
+    d[2] = d[2].replace(home, '~/')
     d.push(size)
     t.push(d)
     tot += size
@@ -24,7 +27,7 @@ var handleEnd = function(){
 
   t.push([])
   t.push([DUPLICATES.length + ' matches', '', '', tot])
-  console.log(t.toString())
+  console.log('\n' + t.toString())
 
 }
 
@@ -83,5 +86,9 @@ var traversePath = function(root){
   })
 }
 
-
-traversePath(process.argv.length > 2 ? process.argv[2] : process.cwd())
+if (!module.parent){
+  var argv = require('optimist').argv;
+  traversePath(argv[0] || process.cwd())
+} else {
+  module.exports = traversePath
+}
